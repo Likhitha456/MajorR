@@ -12,10 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SignUpActivity"></activity>
+        <activity android:name=".SeatProbability"></activity>
+        <activity android:name=".LoginActivity" />
         <activity android:name=".HomeActivity" />
         <activity android:name=".CallActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".SignUpActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

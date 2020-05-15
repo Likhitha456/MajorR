@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ClipData;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,37 +17,37 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.UserInfo;
 
 public class HomeActivity extends AppCompatActivity {
+    ImageView onClick1,onClick2,onClick3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        ImageView Onclick1=findViewById(R.id.imageView2);
-        Onclick1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent myIntent = new Intent(HomeActivity.this,CallActivity.class);
-                startActivity(myIntent);
-            }
-        });
-       /* BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
-        //BottomNavigationViewHelper.disableShiftMode(BottomNavigationView);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
-        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.bottom_navigation_item_home:
+
+        onClick1=findViewById(R.id.imageView1);
+        onClick2=findViewById(R.id.imageView2);
+        onClick3=findViewById(R.id.imageView3);
+
+        ImageView[] imageViews={onClick1,onClick2,onClick3};
+        for (int i=0;i<imageViews.length;i++){
+            imageViews[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switch (v.getId()){
+                        case R.id.imageView1:Intent intent1= new Intent(HomeActivity.this,CallActivity.class);
+                        startActivity(intent1);
                         break;
-                    case R.id.bottom_navigation_item_booking:
-                        break;
-                    case R.id.bottom_navigation_item_profile:
-                        //Intent b = new Intent(MainActivity.this, UserInfo.class);
-                        // startActivity(b);
-                        break;
+                        //case R.id.imageView2:Intent intent3=new Intent(HomeActivity.this,SeatProbability.class);
+                      //  startActivity(intent3);
+                        //break;
+                        case R.id.imageView3:Intent intent2=new Intent(HomeActivity.this,SeatProbability.class);
+                            startActivity(intent2);
+                            break;
+                    }
                 }
-                return false;
-            }
-        });*/
+            });
+        }
+
     }
+
 }

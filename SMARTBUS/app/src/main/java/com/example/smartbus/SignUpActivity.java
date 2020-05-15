@@ -20,6 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.regex.Pattern;
@@ -28,7 +29,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     ProgressBar progressBar;
     EditText editTextEmail;
-    TextInputEditText editTextPassword,editTextName;
+    TextInputEditText editTextPassword,editTextName,phone1,phone2;
     private FirebaseAuth mAuth;
 
     @Override
@@ -38,7 +39,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         editTextEmail = (EditText) findViewById(R.id.Email);
         editTextPassword= (TextInputEditText) findViewById((R.id.Password));
-        //editTextName=(TextInputEditText) findViewById(R.id.Name);
+        editTextName=(TextInputEditText) findViewById(R.id.name);
+        phone1=findViewById(R.id.phone1);
+        phone2=findViewById(R.id.phone2);
         progressBar = findViewById(R.id.progressBar);
 
         mAuth = FirebaseAuth.getInstance();
@@ -51,7 +54,10 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private void registerUser(){
         final String email = editTextEmail.getText().toString().trim();
         final String password = editTextPassword.getText().toString().trim();
-        //final String name=editTextName.getText().toString().trim();
+        final String name=editTextName.getText().toString().trim();
+        final String ph1=phone1.getText().toString().trim();
+        final String ph2=phone2.getText().toString().trim();
+
         if(email.isEmpty()){
             editTextEmail.setError("Email is required");
             editTextEmail.requestFocus();
@@ -85,6 +91,20 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             return;
         }
 
+        String PhoneChars = "(^[0-9]*$)";
+        if(ph1.length()!=10 || !ph1.matches(PhoneChars))
+        {
+            phone1.setError("invalid phone number");
+            phone1.requestFocus();
+            return;
+        }
+        if(ph2.length()!=10 || !ph1.matches(PhoneChars))
+        {
+            phone2.setError("invalid phone number");
+            phone1.requestFocus();
+            return;
+        }
+
         String lowerCaseChars = "(.*[a-z].*)";
         if (!password.matches(lowerCaseChars ))
         {
@@ -110,15 +130,30 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         progressBar.setVisibility(View.VISIBLE);
-
         mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar.setVisibility(View.GONE);
                 if(task.isSuccessful()){
-                    Toast.makeText(getApplicationContext(),"registered successfully",Toast.LENGTH_SHORT).show();
-                  Intent a = new Intent(SignUpActivity.this, HomeActivity.class);
-                   startActivity(a);
+
+                    FirebaseUser user = mAuth.getCurrentUser(); //this wil fetch the firebase user obj
+                    final String userId = user.getUid();
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(name).build();
+
+                    user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                User user=new User(ph1,ph2);
+//                                FirebaseDatabase.getInstance().getReference().child("users").child(userId).child("phone1").setValue(phone1);
+                               FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user);
+                                Toast.makeText(getApplicationContext(),"registered successfully",Toast.LENGTH_SHORT).show();
+                                Intent a = new Intent(SignUpActivity.this, HomeActivity.class);
+                                startActivity(a);
+                            }
+                        }
+                    });
+
                 }
                 else{
                     if(task.getException() instanceof FirebaseAuthUserCollisionException){
@@ -133,17 +168,16 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
     }
-
-   /* @Override
+    @Override
     protected void onStart() {
         super.onStart();
         if(mAuth.getCurrentUser()!=null)
         {
-            Intent a = new Intent(SignUpActivity.this, CallActivity.class);
+            Intent a = new Intent(SignUpActivity.this, HomeActivity.class);
             startActivity(a);
         }
     }
-*/
+
     @Override
     public void onClick(View view) {
         switch(view.getId()) {
@@ -154,7 +188,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
             case R.id.log_in:
                 Intent intentLogin = new Intent(this, LoginActivity.class);
-                intentLogin.addFlags(intentLogin.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intentLogin);
                 finish();
 
